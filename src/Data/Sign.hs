@@ -9,13 +9,18 @@
 -- Stability   :  provisional
 -- Portability :  non-portable (FlexibleInstances, DeriveDataTypeable, CPP)
 --
--- Algebra of Signs.
---
+-- This module provides arithmetic over signs (i.e. {-, 0, +}) and set of signs.
+-- 
+-- For the purpose of abstract interpretation, it might be convenient to use
+-- 'L.Lattice' instance. See also lattices package
+-- (<http://hackage.haskell.org/package/lattices>).
+-- 
 -----------------------------------------------------------------------------
 module Data.Sign
   (
-  -- * Algebra of Sign
+  -- * The Sign data type
     Sign (..)
+  -- * Operations over signs
   , negate
   , abs
   , mult
@@ -24,6 +29,8 @@ module Data.Sign
   , pow
   , signOf
   , symbol
+  -- * Operations over sets of signs
+  -- $SET
   ) where
 
 import qualified Prelude as P
@@ -38,7 +45,11 @@ import Data.Typeable
 import Data.Data
 import qualified Numeric.Algebra as Alg
 
-data Sign = Neg | Zero | Pos
+-- | Signs of real numbers.
+data Sign
+  = Neg   -- ^ negative
+  | Zero  -- ^ zero
+  | Pos   -- ^ positive
   deriving (Eq, Ord, Show, Read, Enum, Bounded, Typeable, Data)
 
 instance NFData Sign
@@ -64,16 +75,19 @@ instance Alg.Division Sign where
   (\\)  = flip div
   (^)   = pow
 
+-- | Unary negation.
 negate :: Sign -> Sign
 negate Neg  = Pos
 negate Zero = Zero
 negate Pos  = Neg
 
+-- | Absolute value.
 abs :: Sign -> Sign
 abs Neg  = Pos
 abs Zero = Zero
 abs Pos  = Pos
 
+-- | Multiplication.
 mult :: Sign -> Sign -> Sign
 mult Pos s  = s
 mult s Pos  = s
@@ -81,22 +95,26 @@ mult Neg s  = negate s
 mult s Neg  = negate s
 mult _ _    = Zero
 
+-- | Reciprocal fraction.
 recip :: Sign -> Sign
 recip Pos  = Pos
 recip Zero = error "Data.Sign.recip: division by Zero"
 recip Neg  = Neg
 
+-- | Fractional division.
 div :: Sign -> Sign -> Sign
 div s Pos  = s
 div _ Zero = error "Data.Sign.div: division by Zero"
 div s Neg  = negate s
 
+-- | Fractional division.
 pow :: Integral x => Sign -> x -> Sign
 pow _ 0    = Pos
 pow Pos _  = Pos
 pow Zero _ = Zero
 pow Neg n  = if even n then Pos else Neg
 
+-- | Sign of a number. 
 signOf :: Real a => a -> Sign
 signOf r =
   case r `compare` 0 of
@@ -104,10 +122,20 @@ signOf r =
     EQ -> Zero
     GT -> Pos
 
+-- | Mnemonic symbol of a number.
+--
+-- This function returns @\"-\"@, @\"0\"@, @\"+\"@ respectively for 'Neg', 'Zero', 'Pos'.
 symbol :: Sign -> String
 symbol Pos  = "+"
 symbol Neg  = "-"
 symbol Zero = "0"
+
+-- $SET
+-- @'Set' 'Sign'@ is equipped with instances of 'Num' and 'Fractional'.
+-- Therefore arithmetic operations can be applied to @'Set' 'Sign'@.
+-- 
+-- Instances of 'L.Lattice' and 'L.BoundedLattice' are also provided for
+-- the purpose of abstract interpretation.
 
 instance L.MeetSemiLattice (Set Sign) where
   meet = Set.intersection
