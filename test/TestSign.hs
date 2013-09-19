@@ -1,0 +1,191 @@
+{-# LANGUAGE TemplateHaskell, ScopedTypeVariables, FlexibleInstances #-}
+
+import Control.Monad
+import Data.List
+import Data.Maybe
+import Data.Ratio
+import qualified Data.Set as Set
+import Data.Set (Set)
+import Test.HUnit hiding (Test)
+import Test.QuickCheck
+import Test.Framework (Test, defaultMain, testGroup)
+import Test.Framework.TH
+import Test.Framework.Providers.HUnit
+import Test.Framework.Providers.QuickCheck2
+
+import qualified Data.Sign as Sign
+import Data.Sign (Sign (..))
+
+{--------------------------------------------------------------------
+  Sign
+--------------------------------------------------------------------}
+
+prop_mult_comm =
+  forAll arbitrary $ \a ->
+  forAll arbitrary $ \b ->
+    a `Sign.mult` b == b `Sign.mult` a
+
+prop_mult_assoc =
+  forAll arbitrary $ \a ->
+  forAll arbitrary $ \b ->
+  forAll arbitrary $ \c ->
+    a `Sign.mult` (b `Sign.mult` c) == (a `Sign.mult` b) `Sign.mult` c
+
+prop_mult_unitL =
+  forAll arbitrary $ \a ->
+    Pos `Sign.mult` a == a
+
+prop_mult_unitR =
+  forAll arbitrary $ \a ->
+    a `Sign.mult` Pos == a
+
+prop_mult_signOf_comm =
+  forAll arbitrary $ \(a::Rational) ->
+  forAll arbitrary $ \b ->
+    Sign.signOf (a * b) == Sign.signOf a `Sign.mult` Sign.signOf b
+
+prop_negate_involution =
+  forAll arbitrary $ \a ->
+    Sign.negate (Sign.negate a) == a
+
+prop_negate_signOf_comm =
+  forAll arbitrary $ \(a::Rational) ->
+    Sign.signOf (negate a) == Sign.negate (Sign.signOf a)
+
+prop_abs_non_neg =
+  forAll arbitrary $ \a ->
+    Sign.abs a /= Neg
+
+prop_abs_mult_orig =
+  forAll arbitrary $ \a ->
+    Sign.abs a `Sign.mult` a == a
+
+prop_abs_idempotent =
+  forAll arbitrary $ \a ->
+    Sign.abs (Sign.abs a) == Sign.abs a
+
+prop_abs_signOf_comm =
+  forAll arbitrary $ \(a::Rational) ->
+    Sign.signOf (abs a) == Sign.abs (Sign.signOf a)
+
+prop_recip_div =
+  forAll arbitrary $ \a ->
+    a /= Zero ==>
+      Sign.recip a == Pos `Sign.div` a
+
+prop_div_inv_mult =
+  forAll arbitrary $ \a ->
+    forAll arbitrary $ \b ->
+      b /= Zero ==>
+        a == (a `Sign.div` b) `Sign.mult` b
+
+prop_pow =
+  forAll arbitrary $ \a ->
+    forAll (choose (0, 10)) $ \(i::Int) ->
+      Sign.pow a i == foldl' Sign.mult Pos (replicate i a)
+
+{--------------------------------------------------------------------
+  Sign set
+--------------------------------------------------------------------}
+
+prop_SetSign_add_comm =
+  forAll arbitrary $ \(a :: Set Sign) ->
+  forAll arbitrary $ \b ->
+    a + b == b + a
+
+prop_SetSign_add_assoc =
+  forAll arbitrary $ \(a :: Set Sign) ->
+  forAll arbitrary $ \b ->
+  forAll arbitrary $ \c ->
+    a + (b + c) == (a + b) + c
+
+prop_SetSign_add_unitL =
+  forAll arbitrary $ \a ->
+    Set.singleton Zero + a == a
+
+prop_SetSign_add_unitR =
+  forAll arbitrary $ \a ->
+    a + Set.singleton Zero == a
+
+prop_SetSign_add_signOf_comm =
+  forAll arbitrary $ \(a::Rational) ->
+  forAll arbitrary $ \b ->
+    Sign.signOf (a+b) `Set.member` (Set.singleton (Sign.signOf a) + Set.singleton (Sign.signOf b))
+
+prop_SetSign_mult_comm =
+  forAll arbitrary $ \(a :: Set Sign) ->
+  forAll arbitrary $ \b ->
+    a * b == b * a
+
+prop_SetSign_mult_assoc =
+  forAll arbitrary $ \(a :: Set Sign) ->
+  forAll arbitrary $ \b ->
+  forAll arbitrary $ \c ->
+    a * (b * c) == (a * b) * c
+
+prop_SetSign_mult_unitL =
+  forAll arbitrary $ \a ->
+    Set.singleton Pos * a == a
+
+prop_SetSign_mult_unitR =
+  forAll arbitrary $ \a ->
+    a * Set.singleton Pos == a
+
+prop_SetSign_mult_signOf_comm =
+  forAll arbitrary $ \(a::Rational) ->
+  forAll arbitrary $ \b ->
+    Sign.signOf (a*b) `Set.member` (Set.singleton (Sign.signOf a) * Set.singleton (Sign.signOf b))
+
+prop_SetSign_negate_involution =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    negate (negate a) == a
+
+prop_SetSign_abs_non_neg =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    Neg `Set.notMember` abs a
+
+prop_SetSign_abs_mult_orig =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    a `Set.isSubsetOf` (abs a * a)
+
+prop_SetSign_abs_idempotent =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    abs (abs a) == abs a
+
+prop_SetSign_pow =
+  forAll arbitrary $ \a ->
+    forAll (choose (0, 10)) $ \(i::Int) ->
+      Sign.pow a i == foldl' Sign.mult Pos (replicate i a)
+
+{--------------------------------------------------------------------
+  Read
+--------------------------------------------------------------------}
+
+prop_show_read_invariance =
+  forAll arbitrary $ \(a::Sign) -> do
+    a == read (show a)
+
+{--------------------------------------------------------------------
+  Generators
+--------------------------------------------------------------------}
+
+instance Arbitrary Sign where
+  arbitrary = arbitraryBoundedEnum
+  shrink    = shrinkNothing
+
+instance CoArbitrary Sign where
+  coarbitrary = coarbitraryEnum
+
+instance Arbitrary (Set Sign) where
+  arbitrary = elements $ map Set.unions $
+                sequence [[Set.singleton s, Set.empty] | s <- [Neg, Zero, Pos]]
+  shrink ss = [Set.delete s ss | s <- Set.toList ss]
+
+instance CoArbitrary (Set Sign) where
+  coarbitrary ss g = foldr (\s g -> variant (fromEnum s) g) g (Set.toList ss)
+
+------------------------------------------------------------------------
+-- Test harness
+
+main :: IO ()
+main = $(defaultMainGenerator)

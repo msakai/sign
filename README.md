@@ -1,4 +1,4 @@
 sign
 ====
 
-Arithmetic over signs and sets of signs
+Arithmetic over signs (i.e. {-,0,+}) and sets of signs
