@@ -42,7 +42,8 @@ Test-suite TestSign
      test-framework,
      test-framework-th,
      test-framework-hunit,
-     test-framework-quickcheck2,
+     -- NOTE: test-framework-quickcheck2 >=0.2.12.3 is necessary for QuickCheck >=2.5
+     test-framework-quickcheck2 >=0.2.12.3 && <0.4.0,
      HUnit,
      -- NOTE: arbitraryBoundedEnum and coarbitraryEnum exist after QuickCheck-2.5
      QuickCheck >=2.5 && <3
