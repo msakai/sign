@@ -7,7 +7,12 @@ Maintainer:	masahiro.sakai@gmail.com
 Category:	Data, Math, Algebra
 Cabal-Version:	>= 1.10
 Synopsis:	Arithmetic over signs and sets of signs
-Description:    Arithmetic over signs (i.e. -, 0, +) and sets of signs
+Description:
+   Arithmetic over signs (i.e. -, 0, +) and sets of signs
+   .
+   Changes in 0.3.0
+   .
+   * avoid dependency issue of comonad-4.* and representable-functors-3.2.0.1
 Bug-Reports:	https://github.com/msakai/sign/issues
 Extra-Source-Files:
    README.md
