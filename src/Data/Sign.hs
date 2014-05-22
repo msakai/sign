@@ -43,7 +43,6 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Typeable
 import Data.Data
-import qualified Numeric.Algebra as Alg
 
 -- | Signs of real numbers.
 data Sign
@@ -58,22 +57,6 @@ instance Hashable Sign where hashWithSalt = hashUsing fromEnum
 
 instance Enumerable Sign where
   universe = universeBounded
-
-instance Alg.Multiplicative Sign where
-  (*)   = mult
-  pow1p s n = pow s (1+n)
-
-instance Alg.Commutative Sign
-
-instance Alg.Unital Sign where
-  one = Pos
-  pow = pow
-
-instance Alg.Division Sign where
-  recip = recip
-  (/)   = div
-  (\\)  = flip div
-  (^)   = pow
 
 -- | Unary negation.
 negate :: Sign -> Sign
@@ -164,28 +147,6 @@ instance Num (Set Sign) where
 instance Fractional (Set Sign) where
   recip        = Set.map recip
   fromRational = Set.singleton . signOf
-
-instance Alg.Multiplicative (Set Sign) where
-  (*) = (*)
-  pow1p s n = Alg.pow s (1+n)
-
-instance Alg.Commutative (Set Sign)
-
-instance Alg.Unital (Set Sign) where
-  one = Set.singleton Pos
-  pow = (Alg.^)
-
-instance Alg.Division (Set Sign) where
-  recip  = P.recip
-  (/)    = (/)
-  (\\)   = flip (/)
-  ss ^ n = Set.map (\s -> pow s n) ss
-
-instance Alg.Additive (Set Sign) where
-  (+)           = (+)
-  sinnum1p _ ss = ss
-
-instance Alg.Abelian (Set Sign)
 
 #if !MIN_VERSION_hashable(1,2,0)
 -- Copied from hashable-1.2.0.7:
