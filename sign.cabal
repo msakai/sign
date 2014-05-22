@@ -13,6 +13,7 @@ Bug-Reports:	https://github.com/msakai/sign/issues
 Extra-Source-Files:
    README.md
    LICENSE
+   CHANGELOG.markdown
    .travis.yml
 Build-Type: Simple
 
