@@ -51,7 +51,7 @@ data Sign
   | Pos   -- ^ positive
   deriving (Eq, Ord, Show, Read, Enum, Bounded, Typeable, Data)
 
-instance NFData Sign
+instance NFData Sign where rnf x = seq x ()
 
 instance Hashable Sign where hashWithSalt = hashUsing fromEnum
 
