@@ -1,5 +1,8 @@
 {-# LANGUAGE TemplateHaskell, ScopedTypeVariables, FlexibleInstances #-}
 
+import Algebra.Enumerable (Enumerable (..)) -- from lattices package
+import qualified Algebra.Lattice as L -- from lattices package
+import Control.DeepSeq
 import Control.Monad
 import Data.List
 import Data.Maybe
@@ -84,6 +87,21 @@ prop_pow =
     forAll (choose (0, 10)) $ \(i::Int) ->
       Sign.pow a i == foldl' Sign.mult Pos (replicate i a)
 
+prop_symbol =
+  forAll arbitrary $ \a b ->
+    a /= b ==> Sign.symbol a /= Sign.symbol b
+
+prop_Show_Read =
+  forAll arbitrary $ \(a :: Sign) ->
+    read (show a) == a
+
+prop_rnf =
+  forAll arbitrary $ \(a :: Sign) ->
+    rnf a == ()
+
+prop_universe =
+  Set.fromList universe == Set.fromList [Neg,Zero,Pos]
+
 {--------------------------------------------------------------------
   Sign set
 --------------------------------------------------------------------}
@@ -151,6 +169,44 @@ prop_SetSign_abs_mult_orig =
 prop_SetSign_abs_idempotent =
   forAll arbitrary $ \(a :: Set Sign) ->
     abs (abs a) == abs a
+
+prop_SetSign_signum_negate_comm =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    signum (negate a) == negate (signum a)
+
+prop_SetSign_signum_abs_comm =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    signum (abs a) == abs (signum a)
+
+prop_SetSign_fromInteger =
+  forAll arbitrary $ \a ->
+  　case a `compare` 0 of
+      EQ -> fromInteger a == Set.singleton Zero
+      LT -> fromInteger a == Set.singleton Neg
+      GT -> fromInteger a == Set.singleton Pos
+
+prop_SetSign_fromRational =
+  forAll arbitrary $ \a ->
+  　case a `compare` 0 of
+      EQ -> fromRational a == Set.singleton Zero
+      LT -> fromRational a == Set.singleton Neg
+      GT -> fromRational a == Set.singleton Pos
+
+prop_SetSign_recip_involution =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    Zero `Set.notMember` a ==> recip (recip a) == a
+
+prop_SetSign_Lattice_top =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    a `Set.isSubsetOf` L.top
+
+prop_SetSign_Lattice_bottom =
+  forAll arbitrary $ \(a :: Set Sign) ->
+    L.bottom `Set.isSubsetOf` a
+
+prop_SetSign_Lattice_Leq_welldefined =
+  forAll arbitrary $ \(a :: Set Sign) b ->
+    a `L.meetLeq` b == a `L.joinLeq` b
 
 prop_SetSign_pow =
   forAll arbitrary $ \a ->
