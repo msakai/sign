@@ -37,6 +37,7 @@ before_install:
    else
      travis_retry sudo apt-get install happy alex
    fi
+ - cabal install hpc-coveralls
 
 install:
  - cabal --version
@@ -65,5 +66,4 @@ script:
    fi
 
 after_script:
-  - cabal install hpc-coveralls
-  - hpc-coveralls TestSign
+ - hpc-coveralls TestSign
