@@ -65,6 +65,6 @@ script:
    fi
 
 after_script:
-  - travis_retry sudo apt-get install tree
-  - tree dist/ # temporarily needed to investigate issue with hpc-coveralls
+ - travis_retry sudo apt-get install tree
+ - tree dist/ # temporarily needed to investigate issue with hpc-coveralls
  - "[ -n \"$COVERAGE\" ] && hpc-coveralls TestSign --exclude-dir=test || true"
