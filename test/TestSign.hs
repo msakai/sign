@@ -3,7 +3,9 @@
 import Algebra.Enumerable (Enumerable (..)) -- from lattices package
 import qualified Algebra.Lattice as L -- from lattices package
 import Control.DeepSeq
+import Control.Exception
 import Control.Monad
+import Data.Either
 import Data.List
 import Data.Maybe
 import Data.Ratio
@@ -16,6 +18,7 @@ import Test.Tasty
 import Test.Tasty.QuickCheck
 import Test.Tasty.HUnit
 import Test.Tasty.TH
+import qualified Test.QuickCheck.Monadic as QM
 
 {--------------------------------------------------------------------
   Sign
@@ -79,6 +82,15 @@ prop_div_inv_mult =
     forAll arbitrary $ \b ->
       b /= Zero ==>
         a == (a `Sign.div` b) `Sign.mult` b
+
+case_recip_Zero = do
+  (ret :: Either SomeException Sign) <- try $ evaluate $ Sign.recip Zero
+  assertBool "Sign.recip Zero should be error" (isLeft ret)
+
+prop_div_Zero = QM.monadicIO $ do
+  a <- QM.pick arbitrary
+  (ret :: Either SomeException Sign) <- QM.run $ try $ evaluate $ a `Sign.div` Zero
+  QM.assert $ isLeft ret
 
 prop_pow =
   forAll arbitrary $ \a ->
