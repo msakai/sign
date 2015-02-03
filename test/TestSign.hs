@@ -9,12 +9,18 @@ import Data.Maybe
 import Data.Ratio
 import qualified Data.Set as Set
 import Data.Set (Set)
-import Test.HUnit hiding (Test)
-import Test.QuickCheck
-import Test.Framework (Test, defaultMain, testGroup)
-import Test.Framework.TH
-import Test.Framework.Providers.HUnit
-import Test.Framework.Providers.QuickCheck2
+
+import Test.Tasty
+import Test.Tasty.QuickCheck
+import Test.Tasty.HUnit
+import Test.Tasty.TH
+
+-- import Test.HUnit hiding (Test)
+-- import Test.QuickCheck
+-- import Test.Framework (Test, defaultMain, testGroup)
+-- import Test.Framework.TH
+-- import Test.Framework.Providers.HUnit
+-- import Test.Framework.Providers.QuickCheck2
 
 import qualified Data.Sign as Sign
 import Data.Sign (Sign (..))
