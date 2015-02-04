@@ -57,4 +57,5 @@ Test-suite TestSign
      TemplateHaskell
      ScopedTypeVariables
      FlexibleInstances
+     CPP
 

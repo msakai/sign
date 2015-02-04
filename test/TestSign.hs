@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell, ScopedTypeVariables, FlexibleInstances #-}
+{-# LANGUAGE TemplateHaskell, ScopedTypeVariables, FlexibleInstances, CPP #-}
 
 import Algebra.Enumerable (Enumerable (..)) -- from lattices package
 import qualified Algebra.Lattice as L -- from lattices package
@@ -255,3 +255,15 @@ instance CoArbitrary (Set Sign) where
 
 main :: IO ()
 main = $(defaultMainGenerator)
+
+#if !MIN_VERSION_base(4,7,0)
+
+isLeft :: Either a b -> Bool
+isLeft (Left  _) = True
+isLeft (Right _) = False
+
+isRight :: Either a b -> Bool
+isRight (Left  _) = False
+isRight (Right _) = True
+
+#endif
