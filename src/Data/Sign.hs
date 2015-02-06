@@ -90,7 +90,9 @@ div s Pos  = s
 div _ Zero = error "Data.Sign.div: division by Zero"
 div s Neg  = negate s
 
--- | Fractional division.
+-- | Exponentiation s^x.
+--
+-- Note that we define @'pow' 'Zero' 0 = 'Pos'@ assuming @0^0 = 1@.
 pow :: Integral x => Sign -> x -> Sign
 pow _ 0    = Pos
 pow Pos _  = Pos
