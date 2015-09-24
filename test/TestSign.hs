@@ -1,6 +1,10 @@
 {-# LANGUAGE TemplateHaskell, ScopedTypeVariables, FlexibleInstances, CPP #-}
 
-import Algebra.Enumerable (Enumerable (..)) -- from lattices package
+#if MIN_VERSION_lattices(1,4,0)
+import Data.Universe.Class (universe) -- from universe-base package
+#else
+import Algebra.Enumerable (Enumerable (universe)) -- from lattices package
+#endif
 import qualified Algebra.Lattice as L -- from lattices package
 import Control.DeepSeq
 import Control.Exception

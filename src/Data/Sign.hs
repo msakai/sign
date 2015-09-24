@@ -35,6 +35,10 @@ module Data.Sign
 
 import qualified Prelude as P
 import Prelude hiding (negate, abs, recip, div)
+#if MIN_VERSION_lattices(1,4,0)
+import qualified Data.Universe.Class as U -- from universe-base package
+import qualified Data.Universe.Helpers as U -- from universe-base package
+#endif
 import Algebra.Enumerable (Enumerable (..), universeBounded) -- from lattices package
 import qualified Algebra.Lattice as L -- from lattices package
 import Control.DeepSeq
@@ -54,6 +58,15 @@ data Sign
 instance NFData Sign where rnf x = seq x ()
 
 instance Hashable Sign where hashWithSalt = hashUsing fromEnum
+
+#if MIN_VERSION_lattices(1,4,0)                             
+
+instance U.Universe Sign where
+  universe = U.universeDef
+  
+instance U.Finite Sign
+  
+#endif
 
 instance Enumerable Sign where
   universe = universeBounded
@@ -122,6 +135,8 @@ symbol Zero = "0"
 -- Instances of 'L.Lattice' and 'L.BoundedLattice' are also provided for
 -- the purpose of abstract interpretation.
 
+#if !MIN_VERSION_lattices(1,4,0)
+    
 instance L.MeetSemiLattice (Set Sign) where
   meet = Set.intersection
 
@@ -131,6 +146,8 @@ instance L.BoundedMeetSemiLattice (Set Sign) where
   top = Set.fromList universe
 
 instance L.BoundedLattice (Set Sign)
+
+#endif
 
 instance Num (Set Sign) where
   ss1 + ss2 = Set.unions [f s1 s2 | s1 <- Set.toList ss1, s2 <- Set.toList ss2]

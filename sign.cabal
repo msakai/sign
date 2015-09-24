@@ -25,10 +25,18 @@ source-repository head
   type:     git
   location: git://github.com/msakai/sign.git
 
+Flag lattices14
+  Description: use lattices >=1.4.0
+  Manual: False
+
 Library
   Hs-source-dirs: src
   Build-Depends:
-     base >=4 && <5, containers >= 0.4.2, deepseq >=1.3.0.0 && <1.5.0.0, hashable >=1.1.2.5 && <1.3.0.0, lattices >=1.2.1.1
+     base >=4 && <5, containers >= 0.4.2, deepseq >=1.3.0.0 && <1.5.0.0, hashable >=1.1.2.5 && <1.3.0.0
+  if flag(lattices14)
+     Build-Depends: lattices >=1.4, universe-base
+  else
+     Build-Depends: lattices >=1.2.1.1 && <1.4
   Default-Language: Haskell2010
   Other-Extensions:
      FlexibleInstances
@@ -56,6 +64,8 @@ Test-suite TestSign
      HUnit,
      -- NOTE: arbitraryBoundedEnum and coarbitraryEnum exist after QuickCheck-2.5
      QuickCheck >=2.5 && <3
+  if flag(lattices14)
+     Build-Depends: universe-base
   Default-Language: Haskell2010
   Other-Extensions:
      TemplateHaskell
