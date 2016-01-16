@@ -1,3 +1,7 @@
+0.4.2
+-----
+* fix compilation error with lattices-1.4
+
 0.4.0
 -----
 * remove dependency on `algebra` package, since it is outdated and not compatible with recent version of other packages
