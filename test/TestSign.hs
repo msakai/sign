@@ -207,8 +207,11 @@ prop_SetSign_fromRational =
       GT -> fromRational a == Set.singleton Pos
 
 prop_SetSign_recip_involution =
-  forAll arbitrary $ \(a :: Set Sign) ->
+  forAll g $ \(a :: Set Sign) ->
     Zero `Set.notMember` a ==> recip (recip a) == a
+  where
+    g = elements $ map Set.unions $
+          sequence [[Set.singleton s, Set.empty] | s <- [Neg, Zero, Pos]]
 
 prop_SetSign_Lattice_top =
   forAll arbitrary $ \(a :: Set Sign) ->
@@ -246,6 +249,8 @@ instance Arbitrary Sign where
 instance CoArbitrary Sign where
   coarbitrary = coarbitraryEnum
 
+#if !MIN_VERSION_QuickCheck(2,8,2)
+
 instance Arbitrary (Set Sign) where
   arbitrary = elements $ map Set.unions $
                 sequence [[Set.singleton s, Set.empty] | s <- [Neg, Zero, Pos]]
@@ -253,6 +258,8 @@ instance Arbitrary (Set Sign) where
 
 instance CoArbitrary (Set Sign) where
   coarbitrary ss g = foldr (\s g -> variant (fromEnum s) g) g (Set.toList ss)
+
+#endif
 
 ------------------------------------------------------------------------
 -- Test harness
