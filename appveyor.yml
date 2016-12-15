@@ -1,21 +1,24 @@
+cache:
+- "c:\\sr" # stack root, short paths == less problems
+
+# to disable automatic builds
+#build: off
+
+environment:
+  global:
+    STACK_ROOT: "c:\\sr"
+
 install:
-- ps: |
-    choco install haskellplatform -version 2014.2.0.0 -y
-    # Haskell Platfrom package doesn't update PATH for the current shell instance
-    $env:Path += ";${env:ProgramFiles}\Haskell Platform\2014.2.0.0\bin"
-    $env:Path += ";${env:ProgramFiles}\Haskell Platform\2014.2.0.0\lib\extralibs\bin"
-    $env:Path += ";${env:ProgramFiles}\Haskell Platform\2014.2.0.0\mingw\bin"
-    cabal sandbox init
-    $env:Path += ";.\.cabal-sandbox\bin"
-    cabal update
-- cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls
+#- curl -ostack.zip -L --insecure http://www.stackage.org/stack/windows-x86_64
+- curl -ostack.zip -L --insecure http://www.stackage.org/stack/windows-i386
+- 7z x stack.zip stack.exe
+- stack setup > nul
 
 build_script:
-- cabal configure --enable-tests --enable-benchmarks -v2
-- cabal build
+- git submodule init
+- git submodule update
 
 test_script:
-- cabal test
-- cabal check
-- cabal sdist
-
+# The ugly echo "" hack is to avoid complaints about 0 being an invalid file
+# descriptor
+- echo "" | stack --no-terminal test
