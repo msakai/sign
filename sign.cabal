@@ -18,10 +18,10 @@ Extra-Source-Files:
    .travis.yml
 Build-Type: Simple
 Tested-With:
-   GHC ==7.6.3
-   GHC ==7.8.3
+   GHC ==7.8.4
    GHC ==7.10.3
-   GHC ==8.0.1
+   GHC ==8.0.2
+   GHC ==8.2.1
 
 source-repository head
   type:     git
