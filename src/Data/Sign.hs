@@ -39,7 +39,9 @@ import Prelude hiding (negate, abs, recip, div)
 import qualified Data.Universe.Class as U -- from universe-base package
 import qualified Data.Universe.Helpers as U -- from universe-base package
 #endif
+#if !MIN_VERSION_lattices(2,0,0)
 import Algebra.Enumerable (Enumerable (..), universeBounded) -- from lattices package
+#endif
 import qualified Algebra.Lattice as L -- from lattices package
 import Control.DeepSeq
 import Data.Hashable
@@ -59,7 +61,7 @@ instance NFData Sign where rnf x = seq x ()
 
 instance Hashable Sign where hashWithSalt = hashUsing fromEnum
 
-#if MIN_VERSION_lattices(1,4,0)                             
+#if MIN_VERSION_lattices(1,4,0)
 
 instance U.Universe Sign where
   universe = U.universeDef
@@ -68,8 +70,12 @@ instance U.Finite Sign
   
 #endif
 
+#if !MIN_VERSION_lattices(2,0,0)
+
 instance Enumerable Sign where
   universe = universeBounded
+
+#endif
 
 -- | Unary negation.
 negate :: Sign -> Sign
