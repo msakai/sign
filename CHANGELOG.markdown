@@ -1,3 +1,11 @@
+0.4.4
+-----
+* fix compilation error with lattices-2.*
+
+0.4.3
+-----
+* fix compilation error with QuickCheck >=2.8.2
+
 0.4.2
 -----
 * fix compilation error with lattices-1.4
