@@ -47,6 +47,9 @@ jobs:
       - name: Test
         run: stack test ${{ matrix.flags }}
 
+      - name: Create source tarball
+        run: stack sdist
+
       - name: Coveralls
         if: matrix.coveralls
         continue-on-error: true
