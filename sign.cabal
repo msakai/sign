@@ -14,7 +14,6 @@ Extra-Source-Files:
    README.md
    LICENSE
    CHANGELOG.markdown
-   appveyor.yml
    .travis.yml
 Build-Type: Simple
 Tested-With:
