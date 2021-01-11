@@ -14,7 +14,6 @@ Extra-Source-Files:
    README.md
    LICENSE
    CHANGELOG.markdown
-   .travis.yml
 Build-Type: Simple
 Tested-With:
    GHC ==7.8.4
