@@ -46,6 +46,9 @@ jobs:
           enable-stack: true
           stack-version: 'latest'
 
+      - name: Setup stack
+        run: stack config set system-ghc --global true
+
       - uses: actions/cache@v1
         name: Cache ~/.stack
         with:
@@ -55,7 +58,6 @@ jobs:
       - name: Build
         run: |
           echo "resolver: ${{ matrix.resolver }}" > stack.yaml
-          echo "system-ghc: true" >> stack.yaml
           stack build --test --no-run-tests --bench --no-run-benchmarks ${{ matrix.flags }}
       - name: Test
         run: stack test ${{ matrix.flags }}
